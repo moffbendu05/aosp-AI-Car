@@ -1,1 +1,28 @@
+name: AOSP Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install git openjdk-11-jdk python3 bc build-essential curl repo zip -y
+
+      - name: Initialize AOSP source
+        run: |
+          mkdir aosp && cd aosp
+          repo init -u https://android.googlesource.com/platform/manifest -b android-13.0.0_r3
+          repo sync -j2
+
+      - name: Build AOSP
+        run: |
+          cd aosp
+          source build/envsetup.sh
+          lunch aosp_arm-eng
+          make -j2 systemimage
 
